@@ -8,7 +8,7 @@ public class Jarvis {
     public static List<Point> findShell(List<Point> points) {
         setLeftmostPointFirst(points);
 
-        List<Point> shell = new ArrayList<Point>();
+        List<Point> shell = new ArrayList<>();
         shell.add(points.get(0));
         points.remove(0);
         points.add(shell.get(0));
@@ -21,7 +21,7 @@ public class Jarvis {
                 }
             }
 
-            if (points.get(right) == shell.get(0)) {
+            if (points.get(right).equals(shell.get(0))) {
                 break;
             }
 
@@ -38,8 +38,8 @@ public class Jarvis {
                 //если i-ая точка лежит левее 0-ой точки
                 //меняем местами номера этих точек
                 Point prevFirst = points.get(0);
-                points.add(0, points.get(i));
-                points.add(i, prevFirst);
+                points.set(0, points.get(i));
+                points.set(i, prevFirst);
             }
         }
     }
