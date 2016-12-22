@@ -44,7 +44,7 @@ public class Jarvis {
         }
     }
 
-    private static double rotate(Point a, Point b, Point c) {
+    public static double rotate(Point a, Point b, Point c) {
         return (b.x - a.x) * (c.y - b.y) - (b.y - a.y) * (c.x - b.x);
     }
 }
