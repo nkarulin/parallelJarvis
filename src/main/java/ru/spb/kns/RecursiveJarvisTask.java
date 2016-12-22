@@ -81,4 +81,48 @@ public class RecursiveJarvisTask extends RecursiveTask<List<Point>> {
 
         return excludePoints;
     }
+
+    /**
+     * @param shellLeft
+     * @param shellRight
+     * @return points to be excluded from the merged shell
+     */
+    static Set<Point> findTopLine(List<Point> shellLeft, List<Point> shellRight) {
+        int a = shellLeft.indexOf(Collections.max(shellLeft));
+        int b = shellRight.indexOf(Collections.min(shellRight));
+
+        System.out.printf("Left (max = %d): %s\n", a, shellLeft);
+        System.out.printf("Right (min = %d): %s\n", b, shellRight);
+
+        Set<Point> excludePoints = new HashSet<>();
+
+        boolean aRotate;
+        boolean bRotate;
+        do {
+            aRotate = false;
+            bRotate = false;
+
+            while (Jarvis.rotate(shellLeft.get(a + 1 == shellLeft.size() ? 0 : a + 1), shellRight.get(b), shellLeft.get(a)) < 0) {
+                excludePoints.add(shellLeft.get(a));
+                a = (a + 1) % shellLeft.size();
+
+                System.out.printf("Rotate a (now a = %d)\n", a);
+                aRotate = true;
+            }
+
+            while (Jarvis.rotate(shellLeft.get(a), shellRight.get(b), shellRight.get(b - 1 == -1 ? shellRight.size() - 1 : b - 1)) > 0) {
+                excludePoints.add(shellRight.get(b));
+                b--;
+                if (b == -1) {
+                    b = shellRight.size() - 1;
+                }
+                System.out.printf("Rotate b (now b = %d)\n", b);
+                bRotate = true;
+            }
+        } while (aRotate || bRotate);
+
+        excludePoints.remove(shellLeft.get(a));
+
+        return excludePoints;
+    }
 }
