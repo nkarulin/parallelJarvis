@@ -6,6 +6,7 @@ import java.util.List;
 public class Jarvis {
 
     public static List<Point> findShell(List<Point> points) {
+        System.out.println("Find Jarvis on " + points);
         setLeftmostPointFirst(points);
 
         List<Point> shell = new ArrayList<>();
@@ -29,6 +30,7 @@ public class Jarvis {
             points.remove(right);
         }
 
+        System.out.println("Found Jarvis on " + points + ": " + shell);
         return shell;
     }
 

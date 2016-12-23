@@ -1,15 +1,12 @@
 package ru.spb.kns;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveTask;
 
 public class RecursiveJarvisTask extends RecursiveTask<List<Point>> {
 
-    private static final int THRESHOLD = 200;
+    public static int THRESHOLD = 200;
     private List<Point> points;
 
     /**
@@ -20,23 +17,35 @@ public class RecursiveJarvisTask extends RecursiveTask<List<Point>> {
     }
 
     protected List<Point> compute() {
-        if (points.size() < THRESHOLD) {
+        if (points.size() <= THRESHOLD) {
             return Jarvis.findShell(points);
         }
 
-        int median = points.size()/2;
-        ForkJoinTask<List<Point>> t1 = new RecursiveJarvisTask(points.subList(0, median));
-        ForkJoinTask<List<Point>> t2 = new RecursiveJarvisTask(points.subList(median, 0));
+        points.sort((o1, o2) -> (int)((o1.x - o2.x) * 10_000));
 
+        int median = points.size()/2;
+        ForkJoinTask<List<Point>> t1 = new RecursiveJarvisTask(new ArrayList<>(points.subList(0, median)));
+        ForkJoinTask<List<Point>> t2 = new RecursiveJarvisTask(new ArrayList<>(points.subList(median, points.size())));
+
+        System.out.println("Fork 1 from 0 to " + median);
         t1.fork();
+        System.out.println("Fork 2 from " + median + " to " + points.size());
         t2.fork();
 
-        return mergeShells(t2.join(), t2.join());
+        return mergeShells(t1.join(), t2.join());
     }
 
     private static List<Point> mergeShells(List<Point> shellLeft, List<Point> shellRight) {
-        findBottomLine(shellLeft, shellRight);
-        return null;
+        System.out.printf("Merge %s and %s into ...%s\n", shellLeft, shellRight, Integer.toHexString(Thread.currentThread().hashCode()));
+        Set<Point> exclude = findBottomLine(shellLeft, shellRight);
+        exclude.addAll(findTopLine(shellLeft, shellRight));
+
+        shellLeft.removeAll(exclude);
+        shellRight.removeAll(exclude);
+        shellLeft.addAll(shellRight);
+
+        System.out.printf("%s...%s\n", Integer.toHexString(Thread.currentThread().hashCode()), shellLeft);
+        return shellLeft;
     }
 
     /**
